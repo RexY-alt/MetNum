@@ -104,7 +104,7 @@ num_equations = st.number_input(
     "Masukkan jumlah persamaan (n):", 
     min_value=1, 
     max_value=10,
-    value=0,
+    value=3,
     step=1,
     key="num_equations_selector",
     help="Jumlah persamaan akan menentukan ukuran matriks n x (n+1)."
