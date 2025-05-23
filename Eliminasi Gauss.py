@@ -93,7 +93,7 @@ def gaussian_elimination(matrix_augmented_input):
 # Bagian 2: Antarmuka Pengguna Streamlit
 # -----------------------------------------------------------------------------
 st.set_page_config(page_title="Solver Eliminasi Gauss", layout="wide")
-st.title("Kalkulator Eliminasi Gauss Interaktif")
+st.title("MyKalkulator Eliminasi Gauss")
 st.markdown("""
 Aplikasi ini memungkinkan Anda untuk menyelesaikan sistem persamaan linear $Ax = b$ menggunakan metode eliminasi Gauss.
 Masukkan jumlah persamaan, lalu isi koefisien matriks augmented $[A|b]$ di bawah ini.
@@ -104,7 +104,7 @@ num_equations = st.number_input(
     "Masukkan jumlah persamaan (n):", 
     min_value=1, 
     max_value=10,
-    value=3,
+    value=0,
     step=1,
     key="num_equations_selector",
     help="Jumlah persamaan akan menentukan ukuran matriks n x (n+1)."
