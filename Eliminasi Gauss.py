@@ -131,90 +131,8 @@ def gaussian_elimination(matrix_augmented_input):
     return x, None, steps # Solusi ditemukan, tidak ada error
 
 # -----------------------------------------------------------------------------
-# Bagian 2: Antarmuka Pengguna Streamlit
+# Bagian 2: Fungsi Helper untuk Tampilan
 # -----------------------------------------------------------------------------
-st.set_page_config(page_title="Solver Eliminasi Gauss", layout="wide")
-st.title("MyKalkulator Eliminasi Gauss")
-st.markdown("""
-Aplikasi ini memungkinkan Anda untuk menyelesaikan sistem persamaan linear $Ax = b$ menggunakan metode eliminasi Gauss.
-Masukkan jumlah persamaan, lalu isi koefisien matriks augmented $[A|b]$ di bawah ini.
-""")
-
-# Input untuk jumlah persamaan
-num_equations = st.number_input(
-    "Masukkan jumlah persamaan (n):", 
-    min_value=1, 
-    max_value=10,
-    value=3,
-    step=1,
-    key="num_equations_selector",
-    help="Jumlah persamaan akan menentukan ukuran matriks n x (n+1)."
-)
-
-# Membuat nama kolom yang dinamis berdasarkan jumlah persamaan
-num_variables = num_equations
-num_cols_augmented = num_variables + 1
-column_names = [f'x{i+1}' for i in range(num_variables)] + ['b (konstanta)']
-
-# Inisialisasi atau update DataFrame di session state
-# Ini penting agar data editor tidak reset saat num_equations berubah
-if 'matrix_df' not in st.session_state or \
-   st.session_state.matrix_df.shape[0] != num_equations or \
-   st.session_state.matrix_df.shape[1] != num_cols_augmented:
-    
-    st.session_state.matrix_df = pd.DataFrame(
-        np.zeros((num_equations, num_cols_augmented), dtype=int), 
-        columns=column_names
-    )
-    # Reset juga solusi jika matriks diubah ukurannya
-    if 'solution' in st.session_state:
-        del st.session_state.solution
-    if 'error_message' in st.session_state:
-        del st.session_state.error_message
-
-
-st.subheader("Masukkan Matriks Augmented $[A|b]$:")
-
-# Konfigurasi kolom untuk st.data_editor - TANPA DESIMAL
-column_config_editor = {}
-for name in column_names:
-    column_config_editor[name] = st.column_config.NumberColumn(
-        label=name,
-        step=1,  # Menentukan langkah increment/decrement
-        format="%d",  # Format tampilan sebagai integer
-        # help=f"Koefisien untuk variabel {name}" if 'x' in name else "Nilai konstanta sisi kanan"
-    )
-
-# Gunakan form untuk mengelompokkan input data editor dan tombol submit
-with st.form(key="matrix_input_form"):
-    edited_df = st.data_editor(
-        st.session_state.matrix_df, 
-        column_config=column_config_editor,
-        num_rows="fixed", # Jumlah baris tetap sesuai num_equations
-        key="data_editor_main_matrix",
-        use_container_width=True
-    )
-    submit_button = st.form_submit_button(label="Selesaikan Sistem Persamaan")
-
-# Logika setelah tombol submit ditekan
-if submit_button:
-    st.session_state.matrix_df = edited_df # Simpan data terbaru dari editor
-    
-    # Validasi input dari DataFrame
-    matrix_input_numpy = edited_df.to_numpy(dtype=float)
-    
-    if np.isnan(matrix_input_numpy).any():
-        st.session_state.error_message = "Harap isi semua sel dalam matriks dengan nilai numerik."
-        if 'solution' in st.session_state: del st.session_state.solution # Hapus solusi lama
-        if 'steps' in st.session_state: del st.session_state.steps # Hapus langkah lama
-    else:
-        # Panggil fungsi eliminasi Gauss
-        solution, error_msg, steps = gaussian_elimination(matrix_input_numpy)
-        st.session_state.solution = solution
-        st.session_state.error_message = error_msg
-        st.session_state.steps = steps
-
-# Fungsi helper untuk menampilkan matriks dalam format yang rapi
 def display_matrix(matrix, step_num=None, description=""):
     if step_num is not None:
         st.markdown(f"**Langkah {step_num}:** {description}")
@@ -237,11 +155,181 @@ def display_matrix(matrix, step_num=None, description=""):
     
     st.dataframe(df_styled, use_container_width=True)
 
+def reset_all_data():
+    """Reset semua data di session state"""
+    keys_to_remove = ['matrix_df', 'solution', 'error_message', 'steps']
+    for key in keys_to_remove:
+        if key in st.session_state:
+            del st.session_state[key]
+
+def update_matrix_size(num_rows, num_cols):
+    """Update ukuran matriks dengan mempertahankan data yang ada"""
+    if 'matrix_df' in st.session_state:
+        current_df = st.session_state.matrix_df
+        current_rows, current_cols = current_df.shape
+        
+        # Buat nama kolom yang baru
+        column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
+        
+        # Buat DataFrame baru dengan ukuran yang diinginkan
+        new_df = pd.DataFrame(
+            np.zeros((num_rows, num_cols), dtype=int), 
+            columns=column_names
+        )
+        
+        # Copy data lama yang masih muat
+        copy_rows = min(current_rows, num_rows)
+        copy_cols = min(current_cols, num_cols)
+        
+        new_df.iloc[:copy_rows, :copy_cols] = current_df.iloc[:copy_rows, :copy_cols]
+        
+        st.session_state.matrix_df = new_df
+    else:
+        # Buat DataFrame baru jika belum ada
+        column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
+        st.session_state.matrix_df = pd.DataFrame(
+            np.zeros((num_rows, num_cols), dtype=int), 
+            columns=column_names
+        )
+
+# -----------------------------------------------------------------------------
+# Bagian 3: Antarmuka Pengguna Streamlit
+# -----------------------------------------------------------------------------
+st.set_page_config(page_title="Solver Eliminasi Gauss", layout="wide")
+st.title("MyKalkulator Eliminasi Gauss 🧮")
+st.markdown("""
+Aplikasi ini memungkinkan Anda untuk menyelesaikan sistem persamaan linear $Ax = b$ menggunakan metode eliminasi Gauss.
+Atur ukuran matriks sesuai kebutuhan, lalu isi koefisien matriks augmented $[A|b]$.
+""")
+
+# Sidebar untuk kontrol matriks
+st.sidebar.header("⚙️ Pengaturan Matriks")
+
+# Input untuk dimensi matriks yang lebih fleksibel
+col1, col2 = st.sidebar.columns(2)
+
+with col1:
+    num_rows = st.number_input(
+        "Jumlah Baris:", 
+        min_value=2, 
+        max_value=8,
+        value=3,
+        step=1,
+        key="num_rows_input",
+        help="Jumlah persamaan dalam sistem"
+    )
+
+with col2:
+    num_variables = st.number_input(
+        "Jumlah Variabel:", 
+        min_value=2, 
+        max_value=8,
+        value=3,
+        step=1,
+        key="num_vars_input",
+        help="Jumlah variabel yang tidak diketahui"
+    )
+
+# Validasi dimensi
+if num_rows != num_variables:
+    st.sidebar.warning("⚠️ Untuk solusi unik, jumlah baris harus sama dengan jumlah variabel!")
+
+num_cols = num_variables + 1  # +1 untuk kolom konstanta
+
+# Tombol untuk reset dan update matriks
+col1, col2 = st.sidebar.columns(2)
+with col1:
+    if st.button("🔄 Update Ukuran", help="Perbarui ukuran matriks"):
+        update_matrix_size(num_rows, num_cols)
+        # Reset hasil perhitungan
+        for key in ['solution', 'error_message', 'steps']:
+            if key in st.session_state:
+                del st.session_state[key]
+
+with col2:
+    if st.button("🗑️ Reset Semua", help="Hapus semua data"):
+        reset_all_data()
+        st.rerun()
+
+# Informasi matriks saat ini
+st.sidebar.info(f"📊 Ukuran matriks: {num_rows} × {num_cols}")
+
+# Template contoh
+st.sidebar.subheader("📚 Template Contoh")
+if st.sidebar.button("📝 Isi Contoh 3×3"):
+    example_data = [
+        [2, 3, -1, 5],
+        [4, 4, -3, 3],
+        [-2, 3, 2, 7]
+    ]
+    if num_rows >= 3 and num_cols >= 4:
+        column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
+        st.session_state.matrix_df = pd.DataFrame(example_data[:num_rows], columns=column_names)
+        # Reset hasil perhitungan
+        for key in ['solution', 'error_message', 'steps']:
+            if key in st.session_state:
+                del st.session_state[key]
+        st.rerun()
+
+# Inisialisasi DataFrame jika belum ada
+if 'matrix_df' not in st.session_state:
+    update_matrix_size(num_rows, num_cols)
+
+# Main content area
+st.subheader(f"📝 Input Matriks Augmented [{num_rows}×{num_cols}]")
+
+# Konfigurasi kolom untuk st.data_editor - TANPA DESIMAL
+column_config_editor = {}
+for name in st.session_state.matrix_df.columns:
+    column_config_editor[name] = st.column_config.NumberColumn(
+        label=name,
+        step=1,  # Menentukan langkah increment/decrement
+        format="%d",  # Format tampilan sebagai integer
+    )
+
+# Gunakan form untuk mengelompokkan input data editor dan tombol submit
+with st.form(key="matrix_input_form"):
+    edited_df = st.data_editor(
+        st.session_state.matrix_df, 
+        column_config=column_config_editor,
+        num_rows="fixed", # Jumlah baris tetap sesuai setting
+        key="data_editor_main_matrix",
+        use_container_width=True,
+        hide_index=False
+    )
+    
+    # Tombol submit dengan style yang lebih menarik
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        submit_button = st.form_submit_button(
+            label="🚀 Selesaikan Sistem Persamaan", 
+            use_container_width=True,
+            type="primary"
+        )
+
+# Logika setelah tombol submit ditekan
+if submit_button:
+    st.session_state.matrix_df = edited_df # Simpan data terbaru dari editor
+    
+    # Validasi input dari DataFrame
+    matrix_input_numpy = edited_df.to_numpy(dtype=float)
+    
+    if np.isnan(matrix_input_numpy).any():
+        st.session_state.error_message = "Harap isi semua sel dalam matriks dengan nilai numerik."
+        if 'solution' in st.session_state: del st.session_state.solution # Hapus solusi lama
+        if 'steps' in st.session_state: del st.session_state.steps # Hapus langkah lama
+    else:
+        # Panggil fungsi eliminasi Gauss
+        solution, error_msg, steps = gaussian_elimination(matrix_input_numpy)
+        st.session_state.solution = solution
+        st.session_state.error_message = error_msg
+        st.session_state.steps = steps
+
 # Tampilkan hasil atau error di luar form, berdasarkan session state
 if 'error_message' in st.session_state and st.session_state.error_message:
     st.error(st.session_state.error_message)
 elif 'solution' in st.session_state and st.session_state.solution is not None:
-    st.success("Solusi berhasil ditemukan!")
+    st.success("Solusi berhasil ditemukan! 🎉")
     
     # Tampilkan langkah-langkah penyelesaian
     if 'steps' in st.session_state and st.session_state.steps:
@@ -310,4 +398,4 @@ elif 'solution' in st.session_state and st.session_state.solution is not None:
         st.dataframe(verification_df, use_container_width=True)
 
 st.markdown("---")
-st.markdown("Dibuat dengan cinta dan kasih sayang.")
+st.markdown("Dibuat dengan penuh cinta dan kasih sayang 💝")
