@@ -6,24 +6,16 @@ import pandas as pd
 # Bagian 1: Definisi Fungsi Eliminasi Gauss
 # -----------------------------------------------------------------------------
 def gaussian_elimination(matrix_augmented_input):
-    """
-    Menyelesaikan sistem persamaan linear Ax = b menggunakan eliminasi Gauss
-    dengan pivoting parsial.
-    Input: matrix_augmented (list of lists atau array NumPy) yang merepresentasikan [A|b].
-    Output: Tuple (vektor_solusi, pesan_error). 
-            vektor_solusi adalah array NumPy jika solusi ditemukan, None jika tidak.
-            pesan_error adalah string jika ada error, None jika berhasil.
-    """
     try:
         A = np.array(matrix_augmented_input, dtype=float)
     except ValueError:
         return None, "Input matriks tidak valid. Pastikan semua elemen adalah angka."
 
-    if A.ndim != 2 or A.shape[0] == 0:
-    return None, "Input matriks tidak valid. Harap masukkan matriks 2D yang valid."
-    
-    m, n = A.shape  # m = jumlah persamaan, n = jumlah kolom
-        
+    if A.ndim != 2 or A.shape[0] == 0:  # Periksa apakah matriks 2D dan tidak kosong
+        return None, "Input matriks tidak valid. Harap masukkan matriks 2D yang valid."
+
+    m, n = A.shape  # m = jumlah persamaan, n = jumlah kolom (termasuk konstanta b)
+
     if m != n - 1:
         return None, (
             f"Matriks augmented harus memiliki kolom satu lebih banyak dari baris "
