@@ -126,7 +126,7 @@ column_config_editor = {}
 for name in column_names:
     column_config_editor[name] = st.column_config.NumberColumn(
         label=name,
-        format="%.4f", # Format angka dengan 4 desimal
+        format="%d", # Format angka sebagai integer untuk tampilan
         # help=f"Koefisien untuk variabel {name}" if 'x' in name else "Nilai konstanta sisi kanan"
     )
 
