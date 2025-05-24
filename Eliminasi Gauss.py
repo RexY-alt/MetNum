@@ -245,7 +245,7 @@ elif 'solution' in st.session_state and st.session_state.solution is not None:
     
     # Tampilkan langkah-langkah penyelesaian
     if 'steps' in st.session_state and st.session_state.steps:
-        st.markdown("## 📌 Langkah-langkah Penyelesaian")
+        st.markdown("## 🔢 Langkah-langkah Penyelesaian")
         
         step_counter = 1
         
@@ -273,7 +273,7 @@ elif 'solution' in st.session_state and st.session_state.solution is not None:
                 step_counter += 1
     
     # Tampilkan solusi akhir
-    st.markdown("## 📍 Solusi Akhir")
+    st.markdown("## ⚡ Solusi Akhir")
     solution_output = st.session_state.solution
     
     # Membuat string LaTeX untuk solusi
