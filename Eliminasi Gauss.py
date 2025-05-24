@@ -180,4 +180,4 @@ elif 'solution' in st.session_state and st.session_state.solution is not None:
             st.text(f"x{i+1} = {val:.4f}")
 
 st.markdown("---")
-st.markdown("Dibuat dengan cinta dan kasih sayang :3")
+st.markdown("Dibuat dengan cinta dan kasih sayang.")
