@@ -100,7 +100,7 @@ num_equations = st.number_input(
 # Membuat nama kolom yang dinamis berdasarkan jumlah persamaan
 num_variables = num_equations
 num_cols_augmented = num_variables + 1
-column_names = [f'$x_{i+1}$' for i in range(num_variables)] + ['$b$ (konstanta)']
+column_names = [f'x{i+1}$' for i in range(num_variables)] + ['b (konstanta)']
 
 # Inisialisasi atau update DataFrame di session state
 # Ini penting agar data editor tidak reset saat num_equations berubah
