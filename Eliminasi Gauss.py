@@ -126,7 +126,7 @@ column_config_editor = {}
 for name in column_names:
     column_config_editor[name] = st.column_config.NumberColumn(
         label=name,
-        step=1 # Menentukan langkah increment/decrement
+        step=1, # Menentukan langkah increment/decrement
         format="%d", # Format tampilan sebagai integer
         # help=f"Koefisien untuk variabel {name}" if 'x' in name else "Nilai konstanta sisi kanan"
     )
