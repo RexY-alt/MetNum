@@ -105,11 +105,11 @@ column_names = [f'x{i+1}' for i in range(num_variables)] + ['b (konstanta)']
 # Inisialisasi atau update DataFrame di session state
 # Ini penting agar data editor tidak reset saat num_equations berubah
 if 'matrix_df' not in st.session_state or \
-   st.session_state.matrix_df.shape!= num_equations or \
-   st.session_state.matrix_df.shape!= num_cols_augmented:
+   st.session_state.matrix_df.shape[0] != num_equations or \
+   st.session_state.matrix_df.shape[1] != num_cols_augmented:
     
     st.session_state.matrix_df = pd.DataFrame(
-        np.zeros((num_equations, num_cols_augmented)), 
+        np.zeros((num_equations, num_cols_augmented), dtype=int), 
         columns=column_names
     )
     # Reset juga solusi jika matriks diubah ukurannya
@@ -126,7 +126,8 @@ column_config_editor = {}
 for name in column_names:
     column_config_editor[name] = st.column_config.NumberColumn(
         label=name,
-        format="%d", # Format angka sebagai integer untuk tampilan
+        step=1 # Menentukan langkah increment/decrement
+        format="%d", # Format tampilan sebagai integer
         # help=f"Koefisien untuk variabel {name}" if 'x' in name else "Nilai konstanta sisi kanan"
     )
 
