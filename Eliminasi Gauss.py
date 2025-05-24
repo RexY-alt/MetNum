@@ -71,7 +71,7 @@ def gaussian_elimination(matrix_augmented_input):
             # Ini seharusnya sudah ditangkap oleh pemeriksaan singularitas sebelumnya
             return None, "Pembagian dengan nol saat substitusi mundur (indikasi matriks singular)."
         
-        sum_ax = np.dot(A[i, i+1:m], x[i+1:m])
+        sum_ax = np.dot(A[i, i+1:n-1], x[i+1:n-1])
         x[i] = (A[i, m] - sum_ax) / A[i, i]
     
     return x, None # Solusi ditemukan, tidak ada error
