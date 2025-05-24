@@ -19,17 +19,12 @@ def gaussian_elimination(matrix_augmented_input):
     except ValueError:
         return None, "Input matriks tidak valid. Pastikan semua elemen adalah angka."
 
-    m = A.shape  # Jumlah baris (persamaan)
+    if A.ndim != 2 or A.shape[0] == 0:
+    return None, "Input matriks tidak valid. Harap masukkan matriks 2D yang valid."
     
-    if m == 0:
-        return None, "Matriks input kosong. Harap masukkan nilai."
+    m, n = A.shape  # m = jumlah persamaan, n = jumlah kolom
         
-    if A.ndim!= 2 or m == 0: # Periksa apakah matriks 2D dan tidak kosong
-        return None, "Input matriks tidak valid. Harap masukkan matriks 2D yang valid."
-
-    n = A.shape  # Jumlah kolom (variabel + 1)
-
-    if m!= n - 1:
+    if m != n - 1:
         return None, (
             f"Matriks augmented harus memiliki kolom satu lebih banyak dari baris "
             f"(diterima {m} baris, {n} kolom). Untuk {m} persamaan, "
