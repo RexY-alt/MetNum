@@ -157,7 +157,7 @@ def display_matrix(matrix, step_num=None, description=""):
 
 def reset_all_data():
     """Reset semua data di session state termasuk data input matriks"""
-    keys_to_remove = ['matrix_df', 'solution', 'error_message', 'steps']
+    keys_to_remove = ['matrix_df', 'solution', 'error_message', 'steps', 'data_editor_main_matrix']
     for key in keys_to_remove:
         if key in st.session_state:
             del st.session_state[key]
@@ -255,6 +255,7 @@ with col2:
         reset_all_data()
         # Buat matriks kosong baru setelah reset
         st.session_state.matrix_df = create_empty_matrix(num_rows, num_cols)
+        # Force rerun untuk memastikan perubahan diterapkan
         st.rerun()
 
 # Informasi matriks saat ini
@@ -294,12 +295,15 @@ for name in st.session_state.matrix_df.columns:
     )
 
 # Gunakan form untuk mengelompokkan input data editor dan tombol submit
+# Gunakan key yang dinamis untuk memaksa refresh data_editor
+reset_key = f"data_editor_main_matrix_{hash(str(st.session_state.get('matrix_df', '').values.tolist()) if 'matrix_df' in st.session_state else 'empty')}"
+
 with st.form(key="matrix_input_form"):
     edited_df = st.data_editor(
         st.session_state.matrix_df, 
         column_config=column_config_editor,
         num_rows="fixed", # Jumlah baris tetap sesuai setting
-        key="data_editor_main_matrix",
+        key=reset_key,
         use_container_width=True,
         hide_index=False
     )
