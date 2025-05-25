@@ -156,11 +156,19 @@ def display_matrix(matrix, step_num=None, description=""):
     st.dataframe(df_styled, use_container_width=True)
 
 def reset_all_data():
-    """Reset semua data di session state"""
+    """Reset semua data di session state termasuk data input matriks"""
     keys_to_remove = ['matrix_df', 'solution', 'error_message', 'steps']
     for key in keys_to_remove:
         if key in st.session_state:
             del st.session_state[key]
+
+def create_empty_matrix(num_rows, num_cols):
+    """Buat matriks kosong (semua nilai 0)"""
+    column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
+    return pd.DataFrame(
+        np.zeros((num_rows, num_cols), dtype=int), 
+        columns=column_names
+    )
 
 def update_matrix_size(num_rows, num_cols):
     """Update ukuran matriks dengan mempertahankan data yang ada"""
@@ -186,11 +194,7 @@ def update_matrix_size(num_rows, num_cols):
         st.session_state.matrix_df = new_df
     else:
         # Buat DataFrame baru jika belum ada
-        column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
-        st.session_state.matrix_df = pd.DataFrame(
-            np.zeros((num_rows, num_cols), dtype=int), 
-            columns=column_names
-        )
+        st.session_state.matrix_df = create_empty_matrix(num_rows, num_cols)
 
 # -----------------------------------------------------------------------------
 # Bagian 3: Antarmuka Pengguna Streamlit
@@ -249,6 +253,8 @@ with col1:
 with col2:
     if st.button("🗑️ Reset Semua", help="Hapus semua data"):
         reset_all_data()
+        # Buat matriks kosong baru setelah reset
+        st.session_state.matrix_df = create_empty_matrix(num_rows, num_cols)
         st.rerun()
 
 # Informasi matriks saat ini
