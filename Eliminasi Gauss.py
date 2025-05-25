@@ -157,10 +157,15 @@ def display_matrix(matrix, step_num=None, description=""):
 
 def reset_all_data():
     """Reset semua data di session state termasuk data input matriks"""
-    keys_to_remove = ['matrix_df', 'solution', 'error_message', 'steps', 'data_editor_main_matrix']
+    keys_to_remove = ['matrix_df', 'solution', 'error_message', 'steps']
     for key in keys_to_remove:
         if key in st.session_state:
             del st.session_state[key]
+    
+    # Increment counter untuk memaksa refresh data_editor
+    if 'reset_counter' not in st.session_state:
+        st.session_state.reset_counter = 0
+    st.session_state.reset_counter += 1
 
 def create_empty_matrix(num_rows, num_cols):
     """Buat matriks kosong (semua nilai 0)"""
@@ -278,6 +283,10 @@ if st.sidebar.button("📝 Isi Contoh 3×3"):
                 del st.session_state[key]
         st.rerun()
 
+# Inisialisasi reset counter jika belum ada
+if 'reset_counter' not in st.session_state:
+    st.session_state.reset_counter = 0
+
 # Inisialisasi DataFrame jika belum ada
 if 'matrix_df' not in st.session_state:
     update_matrix_size(num_rows, num_cols)
@@ -295,15 +304,15 @@ for name in st.session_state.matrix_df.columns:
     )
 
 # Gunakan form untuk mengelompokkan input data editor dan tombol submit
-# Gunakan key yang dinamis untuk memaksa refresh data_editor
-reset_key = f"data_editor_main_matrix_{hash(str(st.session_state.get('matrix_df', '').values.tolist()) if 'matrix_df' in st.session_state else 'empty')}"
+# Gunakan key yang dinamis berdasarkan reset_counter untuk memaksa refresh
+editor_key = f"data_editor_main_matrix_{st.session_state.reset_counter}"
 
 with st.form(key="matrix_input_form"):
     edited_df = st.data_editor(
         st.session_state.matrix_df, 
         column_config=column_config_editor,
         num_rows="fixed", # Jumlah baris tetap sesuai setting
-        key=reset_key,
+        key=editor_key,
         use_container_width=True,
         hide_index=False
     )
