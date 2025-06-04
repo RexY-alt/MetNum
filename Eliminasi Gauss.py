@@ -112,14 +112,14 @@ def gaussian_elimination(matrix_augmented_input):
         # Buat deskripsi langkah substitusi mundur
         if i == m - 1:
             # Persamaan terakhir (paling sederhana)
-            substitution_steps.append(f'x{i+1} = {A[i, -1]:.4f} / {A[i, i]:.4f} = {x[i]:.4f}')
+            substitution_steps.append(f'x{i+1} = {A[i, -1]:.1f} / {A[i, i]:.1f} = {x[i]:.4f}')
         else:
             # Persamaan dengan substitusi
-            substitution_desc = f'x{i+1} = ({A[i, -1]:.4f}'
+            substitution_desc = f'x{i+1} = ({A[i, -1]:.1f}'
             for j in range(i+1, m):
                 if not np.isclose(A[i, j], 0.0, atol=1e-12):
-                    substitution_desc += f' - ({A[i, j]:.4f}) × ({x[j]:.4f})'
-            substitution_desc += f') / {A[i, i]:.4f} = {x[i]:.4f}'
+                    substitution_desc += f' - ({A[i, j]:.1f}) × ({x[j]:.1f})'
+            substitution_desc += f') / {A[i, i]:.1f} = {x[i]:.1f}'
             substitution_steps.append(substitution_desc)
     
     steps.append({
@@ -148,7 +148,7 @@ def display_matrix(matrix, step_num=None, description=""):
     df_display.columns = col_names
     
     # Format angka untuk tampilan yang lebih rapi
-    df_styled = df_display.style.format("{:.4f}").set_table_styles([
+    df_styled = df_display.style.format("{:.1f}").set_table_styles([
         {'selector': 'th', 'props': [('background-color', '#f0f2f6'), ('font-weight', 'bold')]},
         {'selector': 'td', 'props': [('text-align', 'center')]}
     ])
@@ -306,7 +306,7 @@ for name in st.session_state.matrix_df.columns:
     column_config_editor[name] = st.column_config.NumberColumn(
         label=name,
         step=0.1,  # Menentukan langkah increment/decrement
-        format="%.4f", 
+        format="%.1f", 
     )
 
 # Gunakan form untuk mengelompokkan input data editor dan tombol submit
@@ -392,7 +392,7 @@ elif 'solution' in st.session_state and st.session_state.solution is not None:
     # Membuat string LaTeX untuk solusi
     solution_latex = "\\begin{pmatrix}\n"
     for i, val in enumerate(solution_output):
-        solution_latex += f"x_{{{i+1}}} = {val:.4f} \\\\\n"
+        solution_latex += f"x_{{{i+1}}} = {val:.1f} \\\\\n"
     solution_latex = solution_latex.rstrip("\\\\\n") # Hapus \\ dan newline terakhir
     solution_latex += "\n\\end{pmatrix}"
     
