@@ -269,19 +269,20 @@ st.sidebar.info(f"📊 Ukuran matriks: {num_rows} × {num_cols}")
 # Template contoh
 st.sidebar.subheader("📚 Template Contoh")
 if st.sidebar.button("📝 Isi Contoh 3×3"):
-    example_data = [
-        [2, 3, -1, 5],
-        [4, 4, -3, 3],
-        [-2, 3, 2, 7]
-    ]
-    if num_rows >= 3 and num_cols >= 4:
-        column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
-        st.session_state.matrix_df = pd.DataFrame(example_data[:num_rows], columns=column_names)
-        # Reset hasil perhitungan
-        for key in ['solution', 'error_message', 'steps']:
-            if key in st.session_state:
-                del st.session_state[key]
-        st.rerun()
+    if 'matrix_df' not in st.session_state or st.session_state.matrix_df.isnull().values.any():
+        # Hanya isi contoh jika belum ada input atau input belum lengkap
+        example_data = [
+            [2, 3, -1, 5],
+            [4, 4, -3, 3],
+            [-2, 3, 2, 7]
+        ]
+        if num_rows >= 3 and num_cols >= 4:
+            column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
+            st.session_state.matrix_df = pd.DataFrame(example_data[:num_rows], columns=column_names)
+            for key in ['solution', 'error_message', 'steps']:
+                if key in st.session_state:
+                    del st.session_state[key]
+            st.rerun()
 
 # Inisialisasi reset counter jika belum ada
 if 'reset_counter' not in st.session_state:
