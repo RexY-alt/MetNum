@@ -171,7 +171,7 @@ def create_empty_matrix(num_rows, num_cols):
     """Buat matriks kosong (semua nilai 0)"""
     column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
     return pd.DataFrame(
-        np.zeros((num_rows, num_cols), dtype=int), 
+        np.zeros((num_rows, num_cols), dtype=float), 
         columns=column_names
     )
 
@@ -186,7 +186,7 @@ def update_matrix_size(num_rows, num_cols):
         
         # Buat DataFrame baru dengan ukuran yang diinginkan
         new_df = pd.DataFrame(
-            np.zeros((num_rows, num_cols), dtype=int), 
+            np.zeros((num_rows, num_cols), dtype=float), 
             columns=column_names
         )
         
@@ -299,8 +299,8 @@ column_config_editor = {}
 for name in st.session_state.matrix_df.columns:
     column_config_editor[name] = st.column_config.NumberColumn(
         label=name,
-        step=1,  # Menentukan langkah increment/decrement
-        format="%d",  # Format tampilan sebagai integer
+        step=0.1,  # Menentukan langkah increment/decrement
+        format="%.4f",  # Format tampilan sebagai integer
     )
 
 # Gunakan form untuk mengelompokkan input data editor dan tombol submit
