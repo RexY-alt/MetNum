@@ -269,20 +269,25 @@ st.sidebar.info(f"📊 Ukuran matriks: {num_rows} × {num_cols}")
 # Template contoh
 st.sidebar.subheader("📚 Template Contoh")
 if st.sidebar.button("📝 Isi Contoh 3×3"):
-    if 'matrix_df' not in st.session_state or st.session_state.matrix_df.isnull().values.any():
-        # Hanya isi contoh jika belum ada input atau input belum lengkap
-        example_data = [
-            [2, 3, -1, 5],
-            [4, 4, -3, 3],
-            [-2, 3, 2, 7]
-        ]
-        if num_rows >= 3 and num_cols >= 4:
-            column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
-            st.session_state.matrix_df = pd.DataFrame(example_data[:num_rows], columns=column_names)
-            for key in ['solution', 'error_message', 'steps']:
-                if key in st.session_state:
-                    del st.session_state[key]
-            st.rerun()
+    # Pastikan ukuran matriks cocok
+    if num_rows >= 3 and num_cols == 4:  # 3 variabel + 1 konstanta
+        example_data = np.array([
+            [2.0, 3.0, -1.0, 5.0],
+            [4.0, 4.0, -3.0, 3.0],
+            [-2.0, 3.0, 2.0, 7.0]
+        ], dtype=float)
+        
+        column_names = [f'x{i+1}' for i in range(num_cols-1)] + ['b (konstanta)']
+        st.session_state.matrix_df = pd.DataFrame(example_data[:num_rows, :num_cols], columns=column_names)
+        
+        # Reset hasil perhitungan
+        for key in ['solution', 'error_message', 'steps']:
+            if key in st.session_state:
+                del st.session_state[key]
+        
+        st.rerun()
+    else:
+        st.warning("Template 3×3 hanya tersedia untuk ukuran 3 baris dan 3 variabel.")
 
 # Inisialisasi reset counter jika belum ada
 if 'reset_counter' not in st.session_state:
@@ -301,7 +306,7 @@ for name in st.session_state.matrix_df.columns:
     column_config_editor[name] = st.column_config.NumberColumn(
         label=name,
         step=0.1,  # Menentukan langkah increment/decrement
-        format="%.4f",  # Format tampilan sebagai integer
+        format="%.4f", 
     )
 
 # Gunakan form untuk mengelompokkan input data editor dan tombol submit
